@@ -1,5 +1,8 @@
 import sequelize from 'sequelize';
-const { Model, Sequelize } = sequelize;
+const {
+  Model,
+  Sequelize: { DataTypes },
+} = sequelize;
 import DbConn from './index.js';
 import { v4 as UUIDV4 } from 'uuid';
 
@@ -12,15 +15,29 @@ class Users extends Model {
 Users.init(
   {
     id: {
-      type: Sequelize.DataTypes.UUID,
+      type: DataTypes.UUID,
       primaryKey: true,
       allowNull: false,
       defaultValue: () => UUIDV4(),
     },
-    accountType: Sequelize.DataTypes.STRING,
-    email: Sequelize.DataTypes.STRING,
-    firstName: Sequelize.DataTypes.STRING,
-    lastName: Sequelize.DataTypes.STRING,
+    state: {
+      type: DataTypes.ENUM,
+      values: ['ACTIVE', 'ARCHIVED', 'PENDING'],
+    },
+    account_type: {
+      type: DataTypes.ENUM,
+      values: ['CUSTOMER', 'SELLER'],
+    },
+    email: {
+      type: DataTypes.STRING,
+      validate: { isEmail: true },
+      unique: true,
+    },
+    password: {
+      type: DataTypes.STRING,
+    },
+    first_name: DataTypes.STRING(50),
+    last_name: DataTypes.STRING(50),
   },
   {
     sequelize: DbConn.sequelize,
