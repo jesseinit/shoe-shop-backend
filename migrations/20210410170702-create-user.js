@@ -8,15 +8,27 @@ module.exports = {
         allowNull: false,
         defaultValue: Sequelize.UUIDV4,
       },
-      firstName: {
-        type: Sequelize.STRING,
+      state: {
+        type: Sequelize.ENUM,
+        values: ['ACTIVE', 'DELETED', 'PENDING'],
+        defaultValue: 'PENDING',
       },
-      lastName: {
-        type: Sequelize.STRING,
+      account_type: {
+        type: Sequelize.ENUM,
+        values: ['CUSTOMER', 'SELLER'],
+        defaultValue: 'CUSTOMER',
       },
       email: {
         type: Sequelize.STRING,
+        validate: { isEmail: true },
+        unique: true,
       },
+      password: {
+        type: Sequelize.STRING,
+      },
+      first_name: Sequelize.STRING(50),
+      last_name: Sequelize.STRING(50),
+      avatar_url: Sequelize.STRING,
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

@@ -5,12 +5,7 @@ const config = require('../config/config');
 const dbConfig = config[env];
 const db = {};
 
-const sequelizeConnInstance = new Sequelize(
-  dbConfig.database,
-  dbConfig.username,
-  dbConfig.password,
-  dbConfig
-);
+const sequelizeConnInstance = new Sequelize(dbConfig.URL);
 
 try {
   sequelizeConnInstance.authenticate();

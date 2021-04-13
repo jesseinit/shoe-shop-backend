@@ -1,16 +1,17 @@
 import sequelize from 'sequelize';
+import bycrpt from 'bcrypt';
+import DbConn from './index.js';
+import { v4 as UUIDV4 } from 'uuid';
+import { NotificatonManager } from '../utils/helpers.js';
+
 const {
   Model,
   Sequelize: { DataTypes },
 } = sequelize;
-import DbConn from './index.js';
-import { v4 as UUIDV4 } from 'uuid';
 
-class Users extends Model {
-  static associate(models) {
-    // define association here
-  }
-}
+const { HASH_SALT } = process.env;
+
+class Users extends Model {}
 
 Users.init(
   {
@@ -22,11 +23,14 @@ Users.init(
     },
     state: {
       type: DataTypes.ENUM,
-      values: ['ACTIVE', 'ARCHIVED', 'PENDING'],
+      values: ['ACTIVE', 'DELETED', 'PENDING'],
+      defaultValue: 'PENDING',
     },
-    account_type: {
+    accountType: {
       type: DataTypes.ENUM,
       values: ['CUSTOMER', 'SELLER'],
+      defaultValue: 'CUSTOMER',
+      field: 'account_type',
     },
     email: {
       type: DataTypes.STRING,
@@ -36,14 +40,29 @@ Users.init(
     password: {
       type: DataTypes.STRING,
     },
-    first_name: DataTypes.STRING(50),
-    last_name: DataTypes.STRING(50),
+    firstName: { type: DataTypes.STRING(50), field: 'first_name' },
+    lastName: { type: DataTypes.STRING(50), field: 'last_name' },
+    avatarUrl: { type: DataTypes.STRING, field: 'avatar_url' },
   },
   {
     sequelize: DbConn.sequelize,
     freezeTableName: true,
   }
 );
+
+// Hooks
+Users.addHook('beforeCreate', async (user, options) => {
+  const hashedPassword = await bycrpt.hash(user.password, parseInt(HASH_SALT));
+  user.password = hashedPassword;
+});
+
+Users.addHook('afterSave', async (user, options) => {
+  NotificatonManager.sendMail(
+    user.email,
+    'Verify your shoe shop account',
+    '<h1>Verify your account</h1>'
+  );
+});
 
 export default Users;
 
