@@ -1,3 +1,5 @@
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
 import express from 'express';
 import IdentityRouter from './apps/identity/IdentityRouter';
 import morgan from 'morgan';
@@ -16,5 +18,9 @@ app.use((err, req, res, next) => {
   return res.json({ error: err.message });
 });
 
-const PORT = process.env.PORT || 3030;
+process.once('SIGUSR2', () => process.kill(process.pid, 'SIGUSR2'));
+
+const PORT = process.env.NODE_ENV == 'test' ? process.env.TEST_PORT : process.env.PORT || 3030;
 app.listen(PORT, () => console.log(`>>> Serving Requests at ${PORT}`));
+
+export default app;

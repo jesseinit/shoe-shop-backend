@@ -7,13 +7,6 @@ const db = {};
 
 const sequelizeConnInstance = new Sequelize(dbConfig.URL);
 
-try {
-  sequelizeConnInstance.authenticate();
-  console.log('Connection has been established successfully.');
-} catch (error) {
-  console.error('Unable to connect to the database:', error);
-}
-
 db.sequelize = sequelizeConnInstance;
 db.Sequelize = Sequelize;
 
