@@ -1,5 +1,8 @@
 import nodemailer from 'nodemailer';
-const { MAIL_USER, MAIL_PASS } = process.env;
+import redis from 'redis';
+import uuid from 'uuid';
+
+const { MAIL_USER, MAIL_PASS, REDIS_URL } = process.env;
 
 class NotificatonManager {
   static mailTransporter() {
@@ -22,9 +25,20 @@ class NotificatonManager {
 
     this.mailTransporter().sendMail(mailOptions, function (err, info) {
       if (err) throw new Error(`Mail was not sent to ${userEmail}`);
-      console.log('Mail was sent>>>>', info);
     });
   }
 }
 
-export { NotificatonManager };
+class CacheManager {
+  cacheClient = redis.createClient({ url: REDIS_URL });
+}
+
+class RandomNumberGeneratorManager {
+  static generateRandHex() {
+    const buffer = Buffer.alloc(16);
+    uuid.v4({}, buffer);
+    return buffer.toString('hex');
+  }
+}
+
+export { NotificatonManager, CacheManager, RandomNumberGeneratorManager };

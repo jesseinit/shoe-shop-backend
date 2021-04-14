@@ -9,9 +9,10 @@ class IdentityOnboardingService {
     return { id: createdUser.id, firstName, lastName };
   }
 
-  // static async verifyUserAccount({ firstName, lastName, email, password, accountType }) {}
+  // static async verifyUserAccount({ verificationCode }) {}
   // static async initiateUserPasswordReset({ firstName, lastName, email, password, accountType }) {}
   // static async completeUserPasswordReset({ firstName, lastName, email, password, accountType }) {}
+  // static async loginUserAccount({ email, password, accountType }) {}
 }
 
 export { IdentityOnboardingService };

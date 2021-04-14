@@ -9,7 +9,7 @@ const {
   Sequelize: { DataTypes },
 } = sequelize;
 
-const { HASH_SALT } = process.env;
+const { HASH_SALT, NODE_ENV } = process.env;
 
 class Users extends Model {}
 
@@ -46,6 +46,7 @@ Users.init(
   },
   {
     sequelize: DbConn.sequelize,
+    modelName: 'users',
     freezeTableName: true,
   }
 );
@@ -57,11 +58,13 @@ Users.addHook('beforeCreate', async (user, options) => {
 });
 
 Users.addHook('afterSave', async (user, options) => {
-  NotificatonManager.sendMail(
-    user.email,
-    'Verify your shoe shop account',
-    '<h1>Verify your account</h1>'
-  );
+  if (NODE_ENV !== 'test') {
+    NotificatonManager.sendMail(
+      user.email,
+      'Verify your shoe shop account',
+      '<h1>Verify your account</h1>'
+    );
+  }
 });
 
 export default Users;

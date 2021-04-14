@@ -9,6 +9,7 @@ const {
   DATABASE_URL,
   DATABASE_URL_TEST,
 } = process.env;
+
 module.exports = {
   development: {
     URL: DATABASE_URL,

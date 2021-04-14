@@ -9,9 +9,28 @@ describe('Identity Service API', () => {
     const res = await chai.request(app).get('/api/v1');
     expect(res.statusCode).equals(200);
   });
-  // it('should show all users', async () => {
-  //   const res = await request(app).get('/api/v1/users');
-  //   expect(res.statusCode).toEqual(200);
-  //   expect(res.body).toHaveProperty('users');
-  // });
+
+  it('should signup users', async () => {
+    const res = await chai.request(app).post('/api/v1/user/signup').send({
+      firstName: 'Jesse',
+      lastName: 'Doeman',
+      email: 'j3bsie@gmail.com',
+      password: 'password',
+      accountType: 'CUSTOMER',
+    });
+    expect(res.statusCode).equals(201);
+    expect(res.body).haveOwnProperty('data');
+  });
+
+  it('should not signup existing users', async () => {
+    const res = await chai.request(app).post('/api/v1/user/signup').send({
+      firstName: 'Jesse',
+      lastName: 'Doeman',
+      email: 'j3bsie@gmail.com',
+      password: 'password',
+      accountType: 'CUSTOMER',
+    });
+    expect(res.statusCode).equals(409);
+    expect(res.body).haveOwnProperty('error');
+  });
 });
