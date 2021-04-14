@@ -9,6 +9,11 @@ class IdentityContoller {
     const serviceResult = await IdentityOnboardingService.createUserAccount(req.body);
     res.status(201).send({ data: serviceResult });
   }
+
+  static async loginUsers(req, res) {
+    const serviceResult = await IdentityOnboardingService.loginUserAccount(req.body);
+    res.status(200).send({ data: serviceResult });
+  }
 }
 
 export default IdentityContoller;

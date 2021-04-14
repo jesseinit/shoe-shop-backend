@@ -1,8 +1,10 @@
 import nodemailer from 'nodemailer';
 import redis from 'redis';
 import uuid from 'uuid';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
-const { MAIL_USER, MAIL_PASS, REDIS_URL } = process.env;
+const { MAIL_USER, MAIL_PASS, REDIS_URL, HASH_SALT, SECRET_KEY } = process.env;
 
 class NotificatonManager {
   static mailTransporter() {
@@ -41,4 +43,27 @@ class RandomNumberGeneratorManager {
   }
 }
 
-export { NotificatonManager, CacheManager, RandomNumberGeneratorManager };
+class PasswordManager {
+  static async comparePassword(hashedPassword, unhashedPassword) {
+    return await bcrypt.compare(unhashedPassword, hashedPassword);
+  }
+
+  static async hashPassword(unhashedPassword) {
+    return await bcrypt.hash(unhashedPassword, parseInt(HASH_SALT));
+  }
+}
+
+class TokenManager {
+  static async signClaim(claim, ttl = '2d') {
+    return await jwt.sign(claim, SECRET_KEY, { expiresIn: ttl });
+  }
+  static async verifyClaim(token) {}
+}
+
+export {
+  NotificatonManager,
+  CacheManager,
+  RandomNumberGeneratorManager,
+  PasswordManager,
+  TokenManager,
+};

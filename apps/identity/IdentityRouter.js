@@ -1,6 +1,6 @@
 import express from 'express';
 import handleValidationErrors from '../../middlewares/handleValidationErrors';
-import { signUpValidationSchema } from './IdentitySchema';
+import { loginValidationSchema, signUpValidationSchema } from './IdentitySchema';
 import IdentityContoller from './IdentityController';
 import controllerWrapper from '../../middlewares/controllerWrapper';
 const identityRouter = express.Router();
@@ -12,6 +12,13 @@ identityRouter.post(
   signUpValidationSchema,
   handleValidationErrors,
   controllerWrapper(IdentityContoller.signUpUsers)
+);
+
+identityRouter.post(
+  '/user/login',
+  loginValidationSchema,
+  handleValidationErrors,
+  controllerWrapper(IdentityContoller.loginUsers)
 );
 
 export default identityRouter;

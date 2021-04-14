@@ -77,4 +77,34 @@ const signUpValidationSchema = checkSchema({
   },
 });
 
-export { signUpValidationSchema };
+const loginValidationSchema = checkSchema({
+  email: {
+    in: 'body',
+    customSanitizer: {
+      options: (email) => email.trim(),
+    },
+    isEmpty: {
+      negated: true,
+      errorMessage: 'Email cannot be empty',
+    },
+    isEmail: {
+      errorMessage: 'Please provide a valid email',
+    },
+    errorMessage: 'email is too short',
+  },
+  password: {
+    in: 'body',
+    isEmpty: {
+      negated: true,
+      errorMessage: 'Password cannot be empty',
+    },
+    isLength: {
+      options: {
+        min: 6,
+      },
+      errorMessage: 'Password cannot be less than 6 Characters',
+    },
+  },
+});
+
+export { signUpValidationSchema, loginValidationSchema };

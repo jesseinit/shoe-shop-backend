@@ -33,4 +33,13 @@ describe('Identity Service API', () => {
     expect(res.statusCode).equals(409);
     expect(res.body).haveOwnProperty('error');
   });
+
+  it('should be able to login users', async () => {
+    const res = await chai.request(app).post('/api/v1/user/login').send({
+      email: 'j3bsie@gmail.com',
+      password: 'password',
+    });
+    expect(res.statusCode).equals(200);
+    expect(res.body).haveOwnProperty('data');
+  });
 });
