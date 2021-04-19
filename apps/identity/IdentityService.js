@@ -1,18 +1,43 @@
 import User from '../../models/users';
 import { GenericException } from '../../utils/exceptions';
-import { PasswordManager, TokenManager } from '../../utils/helpers';
+import {
+  CacheManager,
+  NotificatonManager,
+  PasswordManager,
+  RandomNumberGeneratorManager,
+  TokenManager,
+} from '../../utils/helpers';
 
 class IdentityOnboardingService {
   static async createUserAccount({ firstName, lastName, email, password, accountType }) {
     const isUserExisting = await User.findOne({ where: { email } });
     if (isUserExisting) throw new GenericException('A user with this email already exists', 409);
     const createdUser = await User.create({ firstName, lastName, email, password, accountType });
+
+    const verificationCode = RandomNumberGeneratorManager.generateRandHex();
+
+    CacheManager.saveToCache(
+      `user:verification:${verificationCode}`,
+      JSON.stringify({ isUserVerified: false, userEmail: createdUser.email }),
+      30 * 60
+    );
+
+    NotificatonManager.sendMail(
+      createdUser.email,
+      'Verify your shoe shop account',
+      `<a href=https://shoe-shop-front.herokuapp.com/verfiy/${verificationCode}>Verify your account</a>`
+    );
+
     return { id: createdUser.id, firstName, lastName };
   }
 
-  // static async verifyUserAccount({ verificationCode }) {}
-  // static async initiateUserPasswordReset({ firstName, lastName, email, password, accountType }) {}
-  // static async completeUserPasswordReset({ firstName, lastName, email, password, accountType }) {}
+  static async verifyUserAccount({ verificationCode, verificationData }) {
+    await User.update({ state: 'ACTIVE' }, { where: { email: verificationData.userEmail } });
+    CacheManager.deleteFromCache(`user:verification:${verificationCode}`);
+    return {
+      status: 'User account verified and activated.',
+    };
+  }
 
   static async loginUserAccount({ email, password }) {
     const user = await User.findOne({ where: { email } });
@@ -23,7 +48,7 @@ class IdentityOnboardingService {
 
     if (!isValidPasword) throw new GenericException('Incorrect email or password entered', 401);
 
-    // if (user.state !== 'ACTIVE') throw new GenericException('Kindly verify your account', 401);
+    if (user.state !== 'ACTIVE') throw new GenericException('Kindly verify your account', 401);
 
     const token = await TokenManager.signClaim({ userId: user.id });
 
@@ -38,6 +63,9 @@ class IdentityOnboardingService {
       },
     };
   }
+
+  // static async initiateUserPasswordReset({ firstName, lastName, email, password, accountType }) {}
+  // static async completeUserPasswordReset({ firstName, lastName, email, password, accountType }) {}
 }
 
 export { IdentityOnboardingService };

@@ -10,6 +10,11 @@ class IdentityContoller {
     res.status(201).send({ data: serviceResult });
   }
 
+  static async verifyUsers(req, res) {
+    const serviceResult = await IdentityOnboardingService.verifyUserAccount(req.body);
+    res.status(200).send({ data: serviceResult });
+  }
+
   static async loginUsers(req, res) {
     const serviceResult = await IdentityOnboardingService.loginUserAccount(req.body);
     res.status(200).send({ data: serviceResult });

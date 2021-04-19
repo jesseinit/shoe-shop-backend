@@ -1,4 +1,6 @@
 import { checkSchema } from 'express-validator';
+import { async } from 'regenerator-runtime';
+import { CacheManager } from '../../utils/helpers';
 
 const signUpValidationSchema = checkSchema({
   email: {
@@ -107,4 +109,18 @@ const loginValidationSchema = checkSchema({
   },
 });
 
-export { signUpValidationSchema, loginValidationSchema };
+const verifyValidationSchema = checkSchema({
+  verificationCode: {
+    in: 'body',
+    custom: {
+      options: async (value, { req }) => {
+        const cacheResult = await CacheManager.retrieveFromCache(`user:verification:${value}`);
+        if (!cacheResult) throw new Error('Invalid verification code');
+        req.body.verificationData = cacheResult;
+      },
+    },
+    errorMessage: 'Please provide a verification code',
+  },
+});
+
+export { signUpValidationSchema, verifyValidationSchema, loginValidationSchema };

@@ -1,12 +1,10 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import express from 'express';
-import IdentityRouter from './apps/identity/IdentityRouter';
 import morgan from 'morgan';
 const app = express();
-import { config as loadEnv } from 'dotenv';
 
-loadEnv();
+import IdentityRouter from './apps/identity/IdentityRouter';
 
 app.use(morgan('dev'));
 

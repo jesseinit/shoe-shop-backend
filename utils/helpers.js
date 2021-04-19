@@ -1,10 +1,13 @@
 import nodemailer from 'nodemailer';
 import redis from 'redis';
-import uuid from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import envs from '../config/env';
 
-const { MAIL_USER, MAIL_PASS, REDIS_URL, HASH_SALT, SECRET_KEY } = process.env;
+const { MAIL_USER, MAIL_PASS, REDIS_URL, HASH_SALT, SECRET_KEY, NODE_ENV } = envs;
+
+const cacheClient = redis.createClient({ url: REDIS_URL });
 
 class NotificatonManager {
   static mailTransporter() {
@@ -18,6 +21,7 @@ class NotificatonManager {
   }
 
   static sendMail(userEmail, subject, htmlContent) {
+    if (NODE_ENV == 'test') return;
     const mailOptions = {
       from: MAIL_USER,
       to: userEmail,
@@ -32,13 +36,28 @@ class NotificatonManager {
 }
 
 class CacheManager {
-  cacheClient = redis.createClient({ url: REDIS_URL });
+  static saveToCache(key, data, ttl = 60) {
+    cacheClient.setex(key, ttl, data);
+  }
+
+  static deleteFromCache(key) {
+    cacheClient.del(key);
+  }
+
+  static retrieveFromCache(key) {
+    return new Promise((resolve, reject) => {
+      cacheClient.get(key, (err, data) => {
+        if (err) return reject('Cache does not not contain this data');
+        return resolve(JSON.parse(data));
+      });
+    });
+  }
 }
 
 class RandomNumberGeneratorManager {
   static generateRandHex() {
     const buffer = Buffer.alloc(16);
-    uuid.v4({}, buffer);
+    uuidv4({}, buffer);
     return buffer.toString('hex');
   }
 }

@@ -2,7 +2,11 @@ import sequelize from 'sequelize';
 import bycrpt from 'bcrypt';
 import DbConn from './index.js';
 import { v4 as UUIDV4 } from 'uuid';
-import { NotificatonManager } from '../utils/helpers.js';
+import {
+  CacheManager,
+  NotificatonManager,
+  RandomNumberGeneratorManager,
+} from '../utils/helpers.js';
 
 const {
   Model,
@@ -55,16 +59,6 @@ Users.init(
 Users.addHook('beforeCreate', async (user, options) => {
   const hashedPassword = await bycrpt.hash(user.password, parseInt(HASH_SALT));
   user.password = hashedPassword;
-});
-
-Users.addHook('afterSave', async (user, options) => {
-  if (NODE_ENV !== 'test') {
-    NotificatonManager.sendMail(
-      user.email,
-      'Verify your shoe shop account',
-      '<h1>Verify your account</h1>'
-    );
-  }
 });
 
 export default Users;
