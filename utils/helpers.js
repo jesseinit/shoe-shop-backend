@@ -21,7 +21,6 @@ class NotificatonManager {
   }
 
   static sendMail(userEmail, subject, htmlContent) {
-    if (NODE_ENV == 'test') return;
     const mailOptions = {
       from: MAIL_USER,
       to: userEmail,

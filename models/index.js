@@ -5,7 +5,7 @@ const config = require('../config/config');
 const dbConfig = config[env];
 const db = {};
 
-const sequelizeConnInstance = new Sequelize(dbConfig.URL);
+const sequelizeConnInstance = new Sequelize(dbConfig.URL, dbConfig.config);
 
 db.sequelize = sequelizeConnInstance;
 db.Sequelize = Sequelize;

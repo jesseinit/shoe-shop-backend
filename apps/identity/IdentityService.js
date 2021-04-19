@@ -15,7 +15,6 @@ class IdentityOnboardingService {
     const createdUser = await User.create({ firstName, lastName, email, password, accountType });
 
     const verificationCode = RandomNumberGeneratorManager.generateRandHex();
-
     CacheManager.saveToCache(
       `user:verification:${verificationCode}`,
       JSON.stringify({ isUserVerified: false, userEmail: createdUser.email }),

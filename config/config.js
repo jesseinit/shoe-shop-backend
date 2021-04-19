@@ -19,6 +19,7 @@ module.exports = {
     password: DB_PASS,
     port: DB_PORT,
     dialect: 'postgres',
+    config: {},
   },
   test: {
     URL: DATABASE_URL_TEST,
@@ -27,6 +28,9 @@ module.exports = {
     database: 'storemanager_test',
     host: '127.0.0.1',
     dialect: 'postgres',
+    config: {
+      logging: false,
+    },
   },
   production: {
     URL: DATABASE_URL,
